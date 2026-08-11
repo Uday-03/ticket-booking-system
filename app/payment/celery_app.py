@@ -9,6 +9,11 @@ celery_app = Celery(
     include=["app.payment.tasks", "app.booking.tasks"],
 )
 
+celery_app.conf.task_routes = {
+    "app.payment.tasks.process_payment_task": {"queue": "payment"},
+    "app.booking.tasks.release_expired_seats": {"queue": "payment"},
+}
+
 celery_app.conf.beat_schedule = {
     # Run every minute to release expired blocked seats
     "release-expired-blocked-seats": {

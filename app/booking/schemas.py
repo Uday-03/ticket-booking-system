@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 from app.booking.models import BookingStatus, SeatStatus
 
 
@@ -52,7 +52,7 @@ class BookingResponse(BaseModel):
     show_id: int
     total_amount: float
     status: BookingStatus
-    ticket: TicketResponse = None
+    ticket: Optional[TicketResponse] = None
 
     class Config:
         from_attributes = True

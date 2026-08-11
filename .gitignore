@@ -9,3 +9,7 @@ venv/
 dist/
 build/
 alembic/versions/*.pyc
+
+# Celery
+celerybeat-schedule
+celerybeat.pid

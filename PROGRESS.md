@@ -156,19 +156,27 @@
 
 ---
 
-## Pending / Next Steps
+---
 
-### Immediate (next session)
-- [ ] Update `.env` with real MySQL password and SECRET_KEY
-- [ ] Create MySQL database: `CREATE DATABASE ticket_booking;`
-- [ ] Generate and run first Alembic migration:
-  ```bash
-  alembic revision --autogenerate -m "initial"
-  alembic upgrade head
-  ```
-- [ ] Start Redis server
-- [ ] Run the API: `uvicorn app.main:app --reload`
-- [ ] Test all endpoints via Swagger UI at http://localhost:8000/docs
+### Session 2 — 2026-08-11
+
+#### Environment Setup
+- [x] Updated `.env` with real MySQL password and SECRET_KEY
+- [x] Created MySQL database: `CREATE DATABASE ticket_booking;`
+- [x] Generated and ran first Alembic migration (`alembic revision --autogenerate -m "initial"` + `alembic upgrade head`)
+- [x] Started Redis server
+- [x] Started Celery worker: `celery -A celery_worker worker --loglevel=info -Q payment`
+- [x] Started Celery beat: `celery -A celery_worker beat --loglevel=info`
+- [x] Started API: `uvicorn app.main:app --reload`
+
+#### Testing
+- [x] Tested all endpoints via Swagger UI at http://localhost:8000/docs — all working ✅
+- [x] Verified Celery beat fires `release_expired_seats` task every 60 seconds ✅
+- [x] Verified automatic seat release: bookings stuck in `payment_pending` for more than 10 minutes are automatically released ✅
+
+---
+
+## Pending / Next Steps
 
 ### Future Enhancements
 - [ ] Email/SMS notifications on booking confirmation and cancellation

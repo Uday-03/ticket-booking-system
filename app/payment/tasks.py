@@ -1,9 +1,10 @@
 from app.payment.celery_app import celery_app
 from app.database import SessionLocal
+from app.auth.models import User  # noqa: F401 — required for FK resolution
+from app.movies.models import Movie
+from app.admin.models import Show, Screen, Seat, Theatre  # noqa: F401
 from app.booking.models import Booking, BookingStatus, BookingSeat, Ticket, SeatAvailability, SeatStatus
 from app.payment.models import Payment, PaymentStatus
-from app.admin.models import Show, Screen, Seat
-from app.movies.models import Movie
 
 
 @celery_app.task(name="app.payment.tasks.process_payment_task", bind=True, max_retries=3)
