@@ -171,4 +171,4 @@ class TestAuthDependencies:
             "/booking/my-bookings",
             headers={"Authorization": "Bearer invalid.token.here"},
         )
-        assert response.status_code == 403
+        assert response.status_code == 401  # Unauthorized, not 403

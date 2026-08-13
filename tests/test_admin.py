@@ -67,7 +67,7 @@ class TestAdminMovies:
             f"/admin/movies/{test_movie.id}",
             headers={"Authorization": f"Bearer {admin_token}"},
         )
-        assert response.status_code == 200
+        assert response.status_code == 204
 
 
     def test_delete_nonexistent_movie(
@@ -197,18 +197,22 @@ class TestAdminSeats:
             f"/admin/screens/{test_screen.id}/seats",
             headers={"Authorization": f"Bearer {admin_token}"},
             json={
-                "seat_rows": [
-                    {"row": "A", "seat_type": "SILVER", "price": 200.0},
-                    {"row": "B", "seat_type": "GOLD", "price": 300.0},
-                ],
-                "seats_per_row": 5,
+                "seats": [
+                    {"seat_number": "A1", "seat_type": "SILVER", "price": 200.0},
+                    {"seat_number": "A2", "seat_type": "SILVER", "price": 200.0},
+                    {"seat_number": "B1", "seat_type": "GOLD", "price": 300.0},
+                    {"seat_number": "B2", "seat_type": "GOLD", "price": 300.0},
+                    {"seat_number": "C1", "seat_type": "PLATINUM", "price": 400.0},
+                ]
             },
         )
         assert response.status_code == 201
+        data = response.json()
+        assert len(data) == 5
         
         # Verify seats were created
         seats = db.query(Seat).filter(Seat.screen_id == test_screen.id).all()
-        assert len(seats) == 10  # 2 rows x 5 seats
+        assert len(seats) == 5
 
 
     def test_add_seats_to_nonexistent_screen(
@@ -221,10 +225,9 @@ class TestAdminSeats:
             "/admin/screens/99999/seats",
             headers={"Authorization": f"Bearer {admin_token}"},
             json={
-                "seat_rows": [
-                    {"row": "A", "seat_type": "SILVER", "price": 200.0},
-                ],
-                "seats_per_row": 5,
+                "seats": [
+                    {"seat_number": "A1", "seat_type": "SILVER", "price": 200.0},
+                ]
             },
         )
         assert response.status_code == 404
@@ -239,6 +242,7 @@ class TestAdminShows:
         admin_token: str,
         test_screen: Screen,
         test_movie: Movie,
+        test_seats: list[Seat],
         db: Session,
     ):
         """Test creating a show."""
@@ -258,13 +262,13 @@ class TestAdminShows:
         assert data["screen_id"] == test_screen.id
         assert data["movie_id"] == test_movie.id
         
-        # Verify seat availability was created
+        # Verify seat availability was created for each seat
         show = db.query(Show).filter(Show.id == data["id"]).first()
         from app.booking.models import SeatAvailability
         availabilities = db.query(SeatAvailability).filter(
             SeatAvailability.show_id == show.id
         ).all()
-        assert len(availabilities) > 0
+        assert len(availabilities) == len(test_seats)  # One per seat
 
 
     def test_create_show_nonexistent_screen(
